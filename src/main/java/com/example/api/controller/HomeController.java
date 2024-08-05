@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class HomeController {
 
     @GetMapping("/all")
-    public ResponseEntity getAll() {
+    public ResponseEntity<?> getAll() {
         return ResponseEntity.ok("ok");
     }
 }

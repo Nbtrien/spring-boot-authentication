@@ -55,8 +55,7 @@ public class AccountServiceImpl implements AccountService {
 
     private Account getCurrentAccount() {
         String email = SecurityContextUtil.currentUser().getUsername();
-        Account account = accountRepository.findFirstByEmailAndIsDeleteIsFalse(email)
+        return accountRepository.findFirstByEmailAndIsDeleteIsFalse(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Account not found."));
-        return account;
     }
 }

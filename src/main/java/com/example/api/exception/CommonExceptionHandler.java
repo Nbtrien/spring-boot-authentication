@@ -11,6 +11,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -91,9 +92,19 @@ public class CommonExceptionHandler {
 
     @ExceptionHandler(AuthorizationDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ErrorResponseDto exceptionHandler(AuthorizationDeniedException ex) {
+    public ErrorResponseDto handleAuthorizationDeniedException(AuthorizationDeniedException ex) {
         ErrorResponseDto response = new ErrorResponseDto(HttpStatus.FORBIDDEN.value(),
                                                          HttpStatus.FORBIDDEN.getReasonPhrase());
+        response.addErrorKeyAndObjectDetail("exception", ex.getLocalizedMessage());
+
+        return response;
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponseDto handleRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
+        ErrorResponseDto response = new ErrorResponseDto(HttpStatus.NOT_FOUND.value(),
+                                                         HttpStatus.NOT_FOUND.getReasonPhrase());
         response.addErrorKeyAndObjectDetail("exception", ex.getLocalizedMessage());
 
         return response;
