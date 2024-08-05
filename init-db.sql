@@ -1,0 +1,2 @@
+CREATE
+DATABASE docker_auth_db;
