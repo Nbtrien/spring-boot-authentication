@@ -4,7 +4,7 @@ import com.example.api.dto.authentication.LoginRequestDto;
 import com.example.api.dto.authentication.RefreshTokenRequestDto;
 import com.example.api.dto.authentication.RegisterRequestDto;
 import com.example.api.service.AuthenticationService;
-import com.example.api.service.RefresherTokenService;
+import com.example.api.service.RefreshTokenService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
-    private final RefresherTokenService refresherTokenService;
+    private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/login")
     private ResponseEntity<?> login(@Valid @RequestBody LoginRequestDto requestDto) {
@@ -30,8 +30,14 @@ public class AuthenticationController {
         return ResponseEntity.ok(authenticationService.register(requestDto));
     }
 
+    @PostMapping("/logout")
+    private ResponseEntity<?> logout() {
+        authenticationService.logout();
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/refresh-token")
     private ResponseEntity<?> refreshToken(@Valid @RequestBody RefreshTokenRequestDto requestDto) {
-        return ResponseEntity.ok(refresherTokenService.refreshToken(requestDto));
+        return ResponseEntity.ok(refreshTokenService.refreshToken(requestDto));
     }
 }

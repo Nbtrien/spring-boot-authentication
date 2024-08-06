@@ -9,4 +9,5 @@ public interface AuthenticationService {
 
     AuthResponseDto register(RegisterRequestDto requestDto);
 
+    void logout();
 }

@@ -5,12 +5,13 @@ import com.example.api.dto.authentication.RefreshTokenRequestDto;
 import com.example.api.entity.Account;
 import com.example.api.entity.RefreshToken;
 import com.example.api.exception.RefreshTokenException;
+import com.example.api.exception.UnauthorizedUserException;
 import com.example.api.repository.AccountRepository;
 import com.example.api.repository.RefreshTokenRepository;
 import com.example.api.security.AccountDetailsService;
 import com.example.api.security.JwtTokenUtil;
 import com.example.api.security.UserPrincipal;
-import com.example.api.service.RefresherTokenService;
+import com.example.api.service.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class RefresherTokenServiceImpl implements RefresherTokenService {
+public class RefreshTokenServiceImpl implements RefreshTokenService {
     private final AccountRepository accountRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final AccountDetailsService accountDetailsService;
@@ -81,5 +82,12 @@ public class RefresherTokenServiceImpl implements RefresherTokenService {
     @Override
     public void deleteByAccountId(Long accountId) {
         refreshTokenRepository.deleteByAccount(accountRepository.findById(accountId).get());
+    }
+
+    @Override
+    public void deleteByAccount(Account account) {
+        RefreshToken refreshToken = refreshTokenRepository.findByAccount(account)
+                .orElseThrow(UnauthorizedUserException::new);
+        refreshTokenRepository.delete(refreshToken);
     }
 }

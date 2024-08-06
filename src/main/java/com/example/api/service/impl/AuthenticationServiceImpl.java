@@ -7,14 +7,16 @@ import com.example.api.entity.Account;
 import com.example.api.entity.RefreshToken;
 import com.example.api.entity.Role;
 import com.example.api.exception.ResourceExistException;
+import com.example.api.exception.ResourceNotFoundException;
 import com.example.api.exception.UnauthorizedUserException;
 import com.example.api.repository.AccountRepository;
 import com.example.api.repository.RoleRepository;
 import com.example.api.security.AccountDetailsService;
 import com.example.api.security.JwtTokenUtil;
+import com.example.api.security.SecurityContextUtil;
 import com.example.api.security.UserPrincipal;
 import com.example.api.service.AuthenticationService;
-import com.example.api.service.RefresherTokenService;
+import com.example.api.service.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -36,7 +38,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final AccountDetailsService accountDetailsService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    private final RefresherTokenService refresherTokenService;
+    private final RefreshTokenService refreshTokenService;
 
     @Override
     public AuthResponseDto authenticate(LoginRequestDto requestDto) {
@@ -47,7 +49,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         if (auth.isAuthenticated()) {
             String accessToken = jwtTokenUtil.generateToken(userPrincipal);
-            RefreshToken refreshToken = refresherTokenService.createRefreshToken(userPrincipal.getId());
+            RefreshToken refreshToken = refreshTokenService.createRefreshToken(userPrincipal.getId());
 
             return AuthResponseDto.builder().accessToken(accessToken).refreshToken(refreshToken.getToken())
                     .accountId(userPrincipal.getId())
@@ -74,5 +76,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         accountRepository.saveAndFlush(account);
         return authenticate(new LoginRequestDto(requestDto.getEmail(), requestDto.getPassword()));
+    }
+
+    @Override
+    public void logout() {
+        Account account = getCurrentAccount();
+        refreshTokenService.deleteByAccount(account);
+    }
+
+    private Account getCurrentAccount() {
+        String email = SecurityContextUtil.currentUser().getUsername();
+        return accountRepository.findFirstByEmailAndIsDeleteIsFalse(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Account not found."));
     }
 }

@@ -29,7 +29,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenUtil jwtTokenUtil;
     private final UserDetailsService userDetailsService;
 
-    private static final String[] EXCLUDED_URLS = new String[]{"/api/public/*", "/api/auth/*"};
+    private static final String[] EXCLUDED_URLS = new String[]{
+            "/api/public/*",
+            "/api/auth/login",
+            "/api/auth/register",
+            "/api/auth/refresh-token"
+    };
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response,

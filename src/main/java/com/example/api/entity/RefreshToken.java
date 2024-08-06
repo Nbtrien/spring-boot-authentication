@@ -19,7 +19,7 @@ public class RefreshToken extends BaseEntity {
     @Column(name = "REFRESH_TOKEN_ID")
     private Long refreshTokenId;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "ACCOUNT_ID", referencedColumnName = "ACCOUNT_ID")
     private Account account;
 
